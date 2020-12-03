@@ -15,12 +15,17 @@ def save_dir(instance, filename):
 class WriterProfile(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
-    name = models.CharField(verbose_name=_("name"), max_length=50)
     stage_name = models.CharField(verbose_name=_("stage name"), blank=True, max_length=50)
-    number_of_books = models.PositiveIntegerField(verbose_name=_("number of books"), default=0,)
     birthday = models.DateField(verbose_name=_("birthday"), blank=True)
     user = models.OneToOneField(to=settings.AUTH_USER_MODEL, verbose_name=_("user"), related_name="WriterProfile",
                                 on_delete=models.CASCADE)
+
+    def number_of_books(self):
+        return Book.objects.filter(
+            writer=self
+        ).aggregate(
+            book=models.Count('id')
+        )['book']
 
     def __str__(self):
         return self.name
