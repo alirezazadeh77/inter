@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from library.models import WriterProfile, Category, Book
 
@@ -21,6 +23,8 @@ class WriterProfileSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     child = serializers.SerializerMethodField()
+    authentication_classes = [JWTAuthentication, ]
+    permission_classes = [IsAuthenticated, ]
 
     class Meta:
         model = Category
@@ -34,6 +38,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
+    categurise = CategorySerializer(many=True)
+
     class Meta:
         model = Book
         fields = ['name', 'writer', 'publisher', 'description', 'release_date', 'book', 'categurise']
