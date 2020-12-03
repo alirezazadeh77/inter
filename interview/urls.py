@@ -17,13 +17,17 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
+from rest_framework_swagger.views import get_swagger_view
 
 from . import settings
+
+schema_view = get_swagger_view(title='ai back')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('library/', include("library.urls")),
     path('auth/', include('customauth.urls')),
+    path('docs/', schema_view),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

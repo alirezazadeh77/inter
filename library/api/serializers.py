@@ -40,7 +40,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
-    categorise = CategorySerializer(many=True)
+    categorise = CategorySerializer(many=True,required=True)
     writer = serializers.SerializerMethodField()
 
     class Meta:

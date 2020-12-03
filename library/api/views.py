@@ -76,13 +76,17 @@ class BookViewSet(CreateModelMixin, DestroyModelMixin, UpdateModelMixin, ListMod
 
     def update(self, request, *args, **kwargs):
         writer = WriterProfile.objects.get(user=request.user)
-        temp = []
-        for x in request.data['categorise']:
-            try:
-                temp.append(CategorySerializer(Category.objects.get(name=x)).data)
-            except Category.DoesNotExist:
-                raise ParseError({"error": f'does not exist {x}'})
-        request.data['categorise'] = temp
+        try:
+            temp = []
+            for x in request.data['categorise']:
+                try:
+                    temp.append(CategorySerializer(Category.objects.get(name=x)).data)
+                except Category.DoesNotExist:
+                    raise ParseError({"error": f'does not exist category {x}'})
+            request.data['categorise'] = temp
+        except KeyError:
+            pass
+
         serializer = BookSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(writer=writer)
