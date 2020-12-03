@@ -1,19 +1,24 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from library.models import WriterProfile, Category, Book
 
 
 class WriterProfileSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
     class Meta:
         model = WriterProfile
         fields = ['stage_name', 'birthday', 'number_of_books', 'user', ]
-        read_only_fields = ['birthday', 'stage_name', ]
+        read_only_fields = ['user', 'number_of_books']
+
+    def get_user(self,obj):
+        user = User.objects.get(id=obj.id)
+        return user.username
+
 
     def create(self, validated_data):
         default = {'stage_name': validated_data.pop('stage_name', ""),
-                   'birthday': validated_data.pop('birthday', "0000-00-00")}
+                   'birthday': validated_data.pop('birthday', "0001-01-01")}
         instance, _created = WriterProfile.objects.update_or_create(
             **validated_data,
             defaults=default
@@ -23,8 +28,6 @@ class WriterProfileSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     child = serializers.SerializerMethodField()
-    authentication_classes = [JWTAuthentication, ]
-    permission_classes = [IsAuthenticated, ]
 
     class Meta:
         model = Category
@@ -33,7 +36,6 @@ class CategorySerializer(serializers.ModelSerializer):
     def get_child(self, obj):
         query = Category.objects.filter(parent=obj.id)
         serializer = CategorySerializer(query, many=True)
-        # return CategorySetializer(obj.(related_name).all).data()
         return serializer.data
 
 

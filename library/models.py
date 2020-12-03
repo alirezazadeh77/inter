@@ -15,8 +15,8 @@ def save_dir(instance, filename):
 class WriterProfile(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
-    stage_name = models.CharField(verbose_name=_("stage name"), blank=True, max_length=50)
-    birthday = models.DateField(verbose_name=_("birthday"), blank=True)
+    stage_name = models.CharField(verbose_name=_("stage name"), max_length=50)
+    birthday = models.DateField(verbose_name=_("birthday"))
     user = models.OneToOneField(to=settings.AUTH_USER_MODEL, verbose_name=_("user"), related_name="WriterProfile",
                                 on_delete=models.CASCADE)
 

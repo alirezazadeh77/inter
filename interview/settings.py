@@ -42,6 +42,10 @@ INSTALLED_APPS = [
 
     # apps
     'library',
+    'customauth',
+
+    # third party
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
