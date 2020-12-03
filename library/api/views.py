@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http import QueryDict
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ParseError
@@ -60,6 +61,20 @@ class BookViewSet(CreateModelMixin, DestroyModelMixin, UpdateModelMixin, ListMod
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
+        writer = WriterProfile.objects.get(user=request.user)
+        temp = []
+        for x in request.data['categorise']:
+            try:
+                temp.append(CategorySerializer(Category.objects.get(name=x)).data)
+            except Category.DoesNotExist:
+                raise ParseError({"error": f'does not exist {x}'})
+        request.data['categorise'] = temp
+        serializer = BookSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(writer=writer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
         writer = WriterProfile.objects.get(user=request.user)
         temp = []
         for x in request.data['categorise']:

@@ -60,7 +60,7 @@ class BookSerializer(serializers.ModelSerializer):
         instance, _created = Book.objects.update_or_create(
             **validated_data,
         )
-
+        instance.categorise.clear()
         for category in _temp:
             instance.categorise.add(category)
 
