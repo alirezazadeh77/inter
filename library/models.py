@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -18,7 +19,7 @@ class WriterProfile(models.Model):
     stage_name = models.CharField(verbose_name=_("stage name"), blank=True, max_length=50)
     number_of_books = models.PositiveIntegerField(verbose_name=_("number of books"), default=0,)
     birthday = models.DateField(verbose_name=_("birthday"), blank=True)
-    user = models.OneToOneField(to="User", verbose_name=_("user"), related_name="WriterProfile",
+    user = models.OneToOneField(to=settings.AUTH_USER_MODEL, verbose_name=_("user"), related_name="WriterProfile",
                                 on_delete=models.CASCADE)
 
     def __str__(self):
