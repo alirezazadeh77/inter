@@ -6,15 +6,15 @@ from library.models import WriterProfile, Category, Book
 
 class WriterProfileSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+
     class Meta:
         model = WriterProfile
         fields = ['stage_name', 'birthday', 'number_of_books', 'user', ]
         read_only_fields = ['user', 'number_of_books']
 
-    def get_user(self,obj):
+    def get_user(self, obj):
         user = User.objects.get(id=obj.id)
         return user.username
-
 
     def create(self, validated_data):
         default = {'stage_name': validated_data.pop('stage_name', ""),
@@ -40,8 +40,28 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
-    categurise = CategorySerializer(many=True)
+    categorise = CategorySerializer(many=True)
+    writer = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
-        fields = ['name', 'writer', 'publisher', 'description', 'release_date', 'book', 'categurise']
+        fields = ['id', 'name', 'writer', 'publisher', 'description', 'release_date', 'book', 'categorise']
+        read_only_fields = ['writer', 'id']
+
+    def get_writer(self, obj):
+        return f'{obj.writer}'
+
+    def create(self, validated_data):
+        _temp = []
+        categorise = validated_data.pop('categorise')
+        for category in categorise:
+            _temp.append(Category.objects.get(name=category['name']))
+
+        instance, _created = Book.objects.update_or_create(
+            **validated_data,
+        )
+
+        for category in _temp:
+            instance.categorise.add(category)
+
+        return instance

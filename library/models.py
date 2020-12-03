@@ -28,7 +28,7 @@ class WriterProfile(models.Model):
         )['book']
 
     def __str__(self):
-        return self.name
+        return f'{self.user}'
 
 
 class Category(models.Model):
@@ -39,7 +39,7 @@ class Category(models.Model):
     is_enable = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
     def clean(self):
         super().clean()
@@ -53,15 +53,15 @@ class Book(models.Model):
     name = models.CharField(verbose_name=_("name"), max_length=50)
     writer = models.ForeignKey("WriterProfile", blank=True, null=True, verbose_name=_("writer"),
                                on_delete=models.CASCADE, related_name="Book")
-    publisher = models.CharField(verbose_name=_("name"), max_length=50)
+    publisher = models.CharField(verbose_name=_("publisher"), max_length=50)
     description = models.TextField(verbose_name=_("description"), blank=True)
     release_date = models.DateField(verbose_name=_("release date"))
     book = models.FileField(blank=True, upload_to=save_dir, verbose_name=_("book"))
-    categurise = models.ManyToManyField('Category', verbose_name=_("categurise"), related_name="book")
+    categorise = models.ManyToManyField('Category', verbose_name=_("categorise"), related_name="book")
     is_enable = models.BooleanField(default=True)
 
     def __str__(self):
-        return f'{self.writer.name} -- {self.name}'
+        return f'{self.writer.user.username} -- {self.name}'
 
     def save(self, *args, **kwargs):
         old_file = ''
